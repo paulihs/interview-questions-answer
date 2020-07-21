@@ -823,7 +823,7 @@ if (process.env.NODE_ENV !== "production") {
                 ref = config.ref;
             } // Remaining properties are added to a new props object
 
-
+            // 将config中的 除了key ref  __self __source这四个属性的其他属性放入props中
             for (propName in config) {
                 if (hasOwnProperty.call(config, propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {
                     props[propName] = config[propName];
@@ -881,6 +881,7 @@ if (process.env.NODE_ENV !== "production") {
                 self = config.__self === undefined ? null : config.__self;
                 source = config.__source === undefined ? null : config.__source; // Remaining properties are added to a new props object
 
+                // 将config中的 除了key ref  __self __source这四个属性的其他属性放入props中
                 for (propName in config) {
                     if (hasOwnProperty.call(config, propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {
                         props[propName] = config[propName];
@@ -890,8 +891,10 @@ if (process.env.NODE_ENV !== "production") {
             // the newly allocated props object.
 
 
+            // 开始处理children
             var childrenLength = arguments.length - 2;
-
+            // 将第三个及以后的参数作为children
+            // 只有一个参数的话children就是一个数据，超过一个的话，把他们包装成一个数组
             if (childrenLength === 1) {
                 props.children = children;
             } else if (childrenLength > 1) {
@@ -902,6 +905,7 @@ if (process.env.NODE_ENV !== "production") {
                 }
 
                 {
+                    // 冻结，不可修改
                     if (Object.freeze) {
                         Object.freeze(childArray);
                     }
@@ -909,8 +913,9 @@ if (process.env.NODE_ENV !== "production") {
 
                 props.children = childArray;
             } // Resolve default props
+            //
 
-
+            // 把type中的defaultProps中有而props中没有的属性放入props中
             if (type && type.defaultProps) {
                 var defaultProps = type.defaultProps;
 
@@ -1562,7 +1567,7 @@ if (process.env.NODE_ENV !== "production") {
                 render: render
             };
         }
-
+        // 是不是合法的元素类型
         function isValidElementType(type) {
             return typeof type === 'string' || typeof type === 'function' || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
                 type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === 'object' && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE);
@@ -2000,10 +2005,12 @@ if (process.env.NODE_ENV !== "production") {
         function jsxWithValidationDynamic(type, props, key) {
             return jsxWithValidation(type, props, key, false);
         }
+        // createElement
         function createElementWithValidation(type, props, children) {
             var validType = isValidElementType(type); // We warn in this case but don't throw. We expect the element creation to
             // succeed and there will likely be errors in render.
 
+            // 如果不是合法的元素类型
             if (!validType) {
                 var info = '';
 
@@ -2061,6 +2068,8 @@ if (process.env.NODE_ENV !== "production") {
 
             return element;
         }
+
+
         function createFactoryWithValidation(type) {
             var validatedFactory = createElementWithValidation.bind(null, type);
             validatedFactory.type = type; // Legacy hook: remove it
